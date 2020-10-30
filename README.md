@@ -1,4 +1,4 @@
-# Battleground Numbers
+# Battleground Nameplate Numbers
 
 ## Brief
 
