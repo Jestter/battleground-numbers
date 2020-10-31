@@ -64,11 +64,7 @@ local function nextTarget(self, button, down)
         if #enemies > 0 then
             local currName = GetUnitName("target", true)
             if currName == nil then 
-                if name == nil then
-                    currName = enemies[1].PlayerName
-                else
-                    currName = name 
-                end
+                currName = name 
             end
             local found = false
             for i = 1, #enemies do
