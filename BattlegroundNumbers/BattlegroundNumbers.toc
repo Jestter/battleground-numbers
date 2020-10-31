@@ -2,7 +2,7 @@
 ## Title: Battleground Nameplate Numbers
 ## Notes: Shows class - number over BG enemy Nameplates
 ## Author: Jestter - Illidan
-## Version: 1.0.0
+## Version: 1.1.0
 #DefaultState: enabled
 
 BattlegroundNumbers.lua
