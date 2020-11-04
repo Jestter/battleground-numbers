@@ -1,12 +1,23 @@
 -- some code came from BattlegroundEnemies AddOn, big thanks to BGE devs!
 BINDING_HEADER_BGNUMBERS = "Battleground Nameplate Numbers"
-_G["BINDING_NAME_CLICK MainFrame:LeftButton"] = "Select next enemy target"
+_G["BINDING_NAME_CLICK MainFrame:LeftButton"] = "Select Next Enemy Target"
 local Data = {}
 Data.Classes = {}
+local BattlegroundNumbers = CreateFrame("Frame", "BattlegroundNumbers")
+BattlegroundNumbers:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
+BattlegroundNumbers:Hide()
+BattlegroundNumbers:RegisterEvent("PLAYER_LOGIN")
 local MainFrame = CreateFrame("Button", "MainFrame",nil,"SecureActionButtonTemplate")
 
 local function isCommonBG()
     return C_PvP.IsBattleground()
+end
+
+local function addonEnabled()
+    if BattlegroundNumbers.db == nil then
+        return false
+    end
+    return BattlegroundNumbers.db.profile.Enabled
 end
 
 local function getEnemyList()
@@ -58,37 +69,39 @@ end
 
 local name = nil
 
-local function nextTarget(self, button, down)    
-    if isCommonBG() and UnitAffectingCombat("player") == false then
-        local enemies = getEnemyList()
-        if #enemies > 0 then
-            local currName = GetUnitName("target", true)
-            if currName == nil then 
-                currName = name 
+local function nextTarget(self, button, down)
+    if addonEnabled() then
+        if isCommonBG() and UnitAffectingCombat("player") == false then
+            local enemies = getEnemyList()
+            if #enemies > 0 then
+                local currName = GetUnitName("target", true)
+                if currName == nil then 
+                    currName = name 
+                end
+                local found = false
+                for i = 1, #enemies do
+                    local player = enemies[i]
+                    if found then
+                        name = player.PlayerName
+                        break;
+                    end
+                    if player.PlayerName == currName then
+                        found = true
+                    end
+                    if i == #enemies then
+                        name = enemies[1].PlayerName
+                    end
+                end
+                MainFrame:SetAttribute(
+                    'macrotext1',
+                    '/cleartarget\n'..
+                    "/targetexact " .. name
+                )
             end
-            local found = false
-            for i = 1, #enemies do
-                local player = enemies[i]
-                if found then
-                    name = player.PlayerName
-                    break;
-                end
-                if player.PlayerName == currName then
-                    found = true
-                end
-                if i == #enemies then
-                    name = enemies[1].PlayerName
-                end
+        else 
+            if isCommonBG() and UnitAffectingCombat("player") then
+                print("|cffFF0000BattleGroundNumbers|r - this functionality cannot be used in combat")
             end
-            MainFrame:SetAttribute(
-                'macrotext1',
-                '/cleartarget\n'..
-                "/targetexact " .. name
-            )
-        end
-    else 
-        if isCommonBG() and UnitAffectingCombat("player") then
-            print("|cffFF0000BattleGroundNumbers|r - this functionality cannot be used in combat")
         end
     end
 end
@@ -120,44 +133,76 @@ do
 	end
 end
 
-local function changeNameplateName(F)
-    local function capitalize(str)
-        -- from http://lua-users.org/wiki/StringRecipes
-        local function tchelper(first, rest)
-            return first:upper()..rest:lower()
-         end
-         return str:gsub("(%a)([%w_']*)", tchelper)
-    end
-    
-    if isCommonBG() and F.unit:find("nameplate") then
-        local PlayerSortingTable = getEnemyList()
-        local ClassCounter = {}
-        
+local function capitalize(str)
+    -- from http://lua-users.org/wiki/StringRecipes
+    local function tchelper(first, rest)
+        return first:upper()..rest:lower()
+     end
+     return str:gsub("(%a)([%w_']*)", tchelper)
+end
 
-        for i = 1, #PlayerSortingTable do
-            local player = PlayerSortingTable[i]
-            local classTag = player.PlayerClass
-            local name = player.PlayerName
-            local role = player.PlayerRoleNumber
-            local spec = player.PlayerSpec
-            if role == 1 then
-                classTag = "HEALER"
-            end
-            if role == 2 then
-                classTag = "TANK"
-            end
-            if ClassCounter[classTag] == nil then
-                ClassCounter[classTag] = 1
-            end
-            if GetUnitName(F.unit, true) == name then
-                F.name:SetText(capitalize(classTag .. " " .. spec ..  " - " .. ClassCounter[classTag]))
-                if UnitIsUnit(F.unit, "target") then
-                    F.name:SetTextColor(1, 0.3, 0.3)
+local function changeNameplateName(F)
+    if addonEnabled() then
+
+        if isCommonBG() and F.unit:find("nameplate") then
+            local PlayerSortingTable = getEnemyList()
+            local ClassCounter = {}
+            
+
+            for i = 1, #PlayerSortingTable do
+                local player = PlayerSortingTable[i]
+                local classTag = player.PlayerClass
+                local name = player.PlayerName
+                local role = player.PlayerRoleNumber
+                local spec = player.PlayerSpec
+                if role == 1 then
+                    classTag = "HEALER"
                 end
+                if role == 2 then
+                    classTag = "TANK"
+                end
+                if ClassCounter[classTag] == nil then
+                    ClassCounter[classTag] = 1
+                end
+                if GetUnitName(F.unit, true) == name then
+                    local nameStr = BattlegroundNumbers.db.profile.EnemyNameplates_Format
+                    if nameStr == nil or nameStr == "" then 
+                        nameStr = "CLASS SPEC - NUM"
+                    end
+                    nameStr = string.gsub(nameStr, "NAME", name)
+                    nameStr = string.gsub(nameStr, "CLASS", classTag)
+                    nameStr = string.gsub(nameStr, "SPEC", spec)
+                    nameStr = string.gsub(nameStr, "NUM", ClassCounter[classTag])
+                    F.name:SetText(capitalize(nameStr))
+
+                    local enableCustomColor = BattlegroundNumbers.db.profile.EnemyNameplates_Color_Enabled
+                    if enableCustomColor then
+                        local color = BattlegroundNumbers.db.profile.EnemyNameplates_Color
+                        F.name:SetTextColor(color[1],color[2],color[3],color[4])
+                    end
+                end
+                ClassCounter[classTag] = ClassCounter[classTag] + 1
             end
-            ClassCounter[classTag] = ClassCounter[classTag] + 1
         end
     end
+end
+
+do
+    local defaultSettings = {
+        profile = {
+            Enabled = true,
+            EnemyNameplates_Color_Enabled = false,
+            EnemyNameplates_Color = {1, 0, 0, 1},
+            EnemyNameplates_Name = ""
+        }
+    }
+    function BattlegroundNumbers:PLAYER_LOGIN()
+		self.db = LibStub("AceDB-3.0"):New("BattlegroundNumbersDB", defaultSettings, true)
+
+		self:SetupOptions()
+		
+		self:UnregisterEvent("PLAYER_LOGIN")
+	end
 end
 
 hooksecurefunc("CompactUnitFrame_UpdateName",changeNameplateName)
