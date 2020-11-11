@@ -1,3 +1,9 @@
+`v1.3.0` | __2020-11-11__
+
+    - Add options for ally nameplates
+    - Allow to change color on ally nameplate names
+    - Allow to hide Heath Bar from ally nameplates
+
 `v1.2.0` | __2020-11-04__
 
     - Add options interface

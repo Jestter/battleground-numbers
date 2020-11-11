@@ -13,6 +13,10 @@ local function isCommonBG()
     return C_PvP.IsBattleground()
 end
 
+local function isArena()
+    return C_PvP.IsArena()
+end
+
 local function addonEnabled()
     if BattlegroundNumbers.db == nil then
         return false
@@ -142,12 +146,39 @@ local function capitalize(str)
 end
 
 local function changeNameplateName(F)
-    if addonEnabled() then
+    if addonEnabled() and F.unit:find("nameplate") then
 
-        if isCommonBG() and F.unit:find("nameplate") then
+        -- Allies Displays
+        if UnitIsPlayer(F.unit) and UnitIsFriend("player",F.unit) then 
+            local displayHBAlways = BattlegroundNumbers.db.profile.AllyNameplates_Hide_HealthBar_Always
+            local displayHBArena = BattlegroundNumbers.db.profile.AllyNameplates_Hide_HealthBar_Enabled["Arena"]
+            local displayHBBG = BattlegroundNumbers.db.profile.AllyNameplates_Hide_HealthBar_Enabled["BattleGrounds"]
+            if (displayHBAlways or 
+                (displayHBArena and isArena()) or 
+                (displayHBBG and isCommonBG())) then
+    
+                F.healthBar:SetScale(0.1)
+                F.healthBar:Hide()
+            end
+    
+    
+            local displayColorAlways = BattlegroundNumbers.db.profile.AllyNameplates_Color_Always
+            local displayColorArena = BattlegroundNumbers.db.profile.AllyNameplates_Color_Enabled["Arena"]
+            local displayColorBG = BattlegroundNumbers.db.profile.AllyNameplates_Color_Enabled["BattleGrounds"]
+            if (displayColorAlways or 
+                (displayColorArena and isArena()) or 
+                (displayColorBG and isCommonBG())) then
+    
+                local color = BattlegroundNumbers.db.profile.AllyNameplates_Color
+                F.name:SetTextColor(color[1],color[2],color[3],color[4])
+            end
+        end
+
+        -- Enemies Displays
+
+        if isCommonBG() then
             local PlayerSortingTable = getEnemyList()
             local ClassCounter = {}
-            
 
             for i = 1, #PlayerSortingTable do
                 local player = PlayerSortingTable[i]
@@ -175,8 +206,8 @@ local function changeNameplateName(F)
                     nameStr = string.gsub(nameStr, "NUM", ClassCounter[classTag])
                     F.name:SetText(capitalize(nameStr))
 
-                    local enableCustomColor = BattlegroundNumbers.db.profile.EnemyNameplates_Color_Enabled
-                    if enableCustomColor then
+                    local enableCustomEnemyColor = BattlegroundNumbers.db.profile.EnemyNameplates_Color_Enabled
+                    if enableCustomEnemyColor then
                         local color = BattlegroundNumbers.db.profile.EnemyNameplates_Color
                         F.name:SetTextColor(color[1],color[2],color[3],color[4])
                     end
@@ -193,7 +224,12 @@ do
             Enabled = true,
             EnemyNameplates_Color_Enabled = false,
             EnemyNameplates_Color = {1, 0, 0, 1},
-            EnemyNameplates_Name = ""
+            EnemyNameplates_Name = "",
+            AllyNameplates_Color_Always = false,
+            AllyNameplates_Color = {0, 1, 0, 1},
+            AllyNameplates_Color_Enabled = {},
+            AllyNameplates_Hide_HealthBar_Always = false,
+            AllyNameplates_Hide_HealthBar_Enabled = {},
         }
     }
     function BattlegroundNumbers:PLAYER_LOGIN()
@@ -205,4 +241,4 @@ do
 	end
 end
 
-hooksecurefunc("CompactUnitFrame_UpdateName",changeNameplateName)
+hooksecurefunc("CompactUnitFrame_OnUpdate",changeNameplateName)
