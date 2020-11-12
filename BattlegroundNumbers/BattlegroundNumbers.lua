@@ -157,7 +157,6 @@ local function changeNameplateName(F)
                 (displayHBArena and isArena()) or 
                 (displayHBBG and isCommonBG())) then
     
-                F.healthBar:SetScale(0.1)
                 F.healthBar:Hide()
             end
     
