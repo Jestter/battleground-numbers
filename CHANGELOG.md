@@ -1,4 +1,4 @@
-`v1.3.1` | __2020-11-11__
+`v1.3.1` | __2020-11-18__
 
     - Update WoW ver 9.0.2
     - Fix lua errors when joining an instance (dungeon/raid)
