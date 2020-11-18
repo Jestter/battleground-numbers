@@ -1,3 +1,15 @@
+`v1.3.1` | __2020-11-18__
+
+    - Update WoW ver 9.0.2
+    - Fix lua errors when joining an instance (dungeon/raid)
+    - Fix enemy HP bar not being displayed when dueling
+
+`v1.3.0` | __2020-11-11__
+
+    - Add options for ally nameplates
+    - Allow to change color on ally nameplate names
+    - Allow to hide Health Bar from ally nameplates
+
 `v1.2.0` | __2020-11-04__
 
     - Add options interface
