@@ -1,3 +1,9 @@
+`v1.3.1` | __2020-11-11__
+
+    - Update WoW ver 9.0.2
+    - Fix lua errors when joining an instance (dungeon/raid)
+    - Fix enemy HP bar not being displayed when dueling
+
 `v1.3.0` | __2020-11-11__
 
     - Add options for ally nameplates

@@ -18,7 +18,8 @@ local function isArena()
 end
 
 local function addonEnabled()
-    if BattlegroundNumbers.db == nil then
+    local inInstance, instanceType = IsInInstance()
+    if BattlegroundNumbers.db == nil or (inInstance and (instanceType == "party" or instanceType == "raid" or instanceType == nil)) then
         return false
     end
     return BattlegroundNumbers.db.profile.Enabled
@@ -155,8 +156,9 @@ local function changeNameplateName(F)
             local displayHBBG = BattlegroundNumbers.db.profile.AllyNameplates_Hide_HealthBar_Enabled["BattleGrounds"]
             if (displayHBAlways or 
                 (displayHBArena and isArena()) or 
-                (displayHBBG and isCommonBG())) then
-    
+                (displayHBBG and isCommonBG())) 
+                and UnitCanAssist("player",F.unit) then
+                
                 F.healthBar:Hide()
             end
     

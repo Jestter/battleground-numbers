@@ -1,8 +1,8 @@
-## Interface: 90001
+## Interface: 90002
 ## Title: Battleground Nameplate Numbers
 ## Notes: Shows class - number over BG enemy Nameplates
 ## Author: Jestter - Illidan
-## Version: 1.3.0-beta
+## Version: 1.3.1
 ## SavedVariables: BattlegroundNumbersDB
 #DefaultState: enabled
 
