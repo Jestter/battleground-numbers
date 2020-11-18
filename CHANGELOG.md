@@ -8,7 +8,7 @@
 
     - Add options for ally nameplates
     - Allow to change color on ally nameplate names
-    - Allow to hide Heath Bar from ally nameplates
+    - Allow to hide Health Bar from ally nameplates
 
 `v1.2.0` | __2020-11-04__
 
