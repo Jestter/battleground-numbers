@@ -1,3 +1,10 @@
+`v1.4.0` | __2021-01-04__
+
+    - Optimize some code for BGs
+    - Add option for custom unit nameplate text color (still trying to colorize the healthbar :c)
+    - Add option to display custom text on arena enemy nameplates
+    - Add option for custom color on nameplates of enemies targeting you
+
 `v1.3.1` | __2020-11-18__
 
     - Update WoW ver 9.0.2

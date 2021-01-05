@@ -6,7 +6,10 @@ Data.Classes = {}
 local BattlegroundNumbers = CreateFrame("Frame", "BattlegroundNumbers")
 BattlegroundNumbers:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
 BattlegroundNumbers:Hide()
+BattlegroundNumbers:RegisterEvent("ADDON_LOADED")
 BattlegroundNumbers:RegisterEvent("PLAYER_LOGIN")
+BattlegroundNumbers:RegisterEvent("PLAYER_ENTERING_BATTLEGROUND")
+BattlegroundNumbers:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
 local MainFrame = CreateFrame("Button", "MainFrame",nil,"SecureActionButtonTemplate")
 
 local function isCommonBG()
@@ -25,7 +28,10 @@ local function addonEnabled()
     return BattlegroundNumbers.db.profile.Enabled
 end
 
-local function getEnemyList()
+local EnemyList = {}
+local EnemyMap = {}
+
+local function getUpdatedEnemyList()
     if isCommonBG() then
         local PlayerSortingTable = {}
         local MyBgFaction = GetBattlefieldArenaFaction()  -- returns the playered faction 0 for horde, 1 for alliance
@@ -67,6 +73,34 @@ local function getEnemyList()
         end
 
         table.sort(PlayerSortingTable, PlayerSortingByRoleClassName)
+
+        local ClassCounter = {}
+        -- mapping order of classes and stuff
+        for i = 1, #PlayerSortingTable do
+            local player = PlayerSortingTable[i]
+            local classTag = player.PlayerClass
+            local name = player.PlayerName
+            local role = player.PlayerRoleNumber
+            local spec = player.PlayerSpec
+            if role == 1 then
+                classTag = "HEALER"
+            end
+            if role == 2 then
+                classTag = "TANK"
+            end
+            if ClassCounter[classTag] == nil then
+                ClassCounter[classTag] = 1
+            end
+            EnemyMap[name] = {
+                name = name,
+                role = role,
+                spec = spec,
+                classTag = classTag,
+                number = ClassCounter[classTag]
+            }
+            ClassCounter[classTag] = ClassCounter[classTag] + 1
+        end
+
         return PlayerSortingTable
     end
     return {}
@@ -77,7 +111,7 @@ local name = nil
 local function nextTarget(self, button, down)
     if addonEnabled() then
         if isCommonBG() and UnitAffectingCombat("player") == false then
-            local enemies = getEnemyList()
+            local enemies = EnemyList
             if #enemies > 0 then
                 local currName = GetUnitName("target", true)
                 if currName == nil then 
@@ -109,6 +143,15 @@ local function nextTarget(self, button, down)
             end
         end
     end
+end
+
+local function getArenaNum(unit)
+    for i=1,5 do
+        if UnitIsUnit(unit,"arena"..i) then
+            return i
+        end
+    end
+    return 0
 end
 
 do
@@ -148,18 +191,21 @@ end
 
 local function changeNameplateName(F)
     if addonEnabled() and F.unit:find("nameplate") then
+        local unitName = GetUnitName(F.unit, true)
 
         -- Allies Displays
-        if UnitIsPlayer(F.unit) and UnitIsFriend("player",F.unit) then 
+        if UnitIsPlayer(F.unit) and UnitIsFriend("player",F.unit) then
             local displayHBAlways = BattlegroundNumbers.db.profile.AllyNameplates_Hide_HealthBar_Always
             local displayHBArena = BattlegroundNumbers.db.profile.AllyNameplates_Hide_HealthBar_Enabled["Arena"]
             local displayHBBG = BattlegroundNumbers.db.profile.AllyNameplates_Hide_HealthBar_Enabled["BattleGrounds"]
             if (displayHBAlways or 
                 (displayHBArena and isArena()) or 
-                (displayHBBG and isCommonBG())) 
-                and UnitCanAssist("player",F.unit) then
+                (displayHBBG and isCommonBG())) and 
+                UnitCanAssist("player",F.unit) then
                 
-                F.healthBar:Hide()
+                if not UnitIsUnit("target",F.unit) then
+                    F.healthBar:Hide()
+                end
             end
     
     
@@ -175,46 +221,96 @@ local function changeNameplateName(F)
             end
         end
 
+        -- local custom = BattlegroundNumbers.db.profile.CustomUnits[unitName]
+        -- if custom and custom.EnabledAllies and (UnitIsFriend("player",F.unit) or UnitCanAssist("player",F.unit)) then
+        --     local color = custom.HColor
+        --     F.healthBar:SetStatusBarColor(color[1],color[2],color[3],color[4])
+        --     F.name:SetTextColor(color[1],color[2],color[3],color[4])
+        -- end
+
         -- Enemies Displays
+        if UnitCanAttack("player",F.unit) then
+            local yTargetEnabled  = BattlegroundNumbers.db.profile.EnemyNameplates_YTarget_Color_Enabled
+            if UnitIsUnit("player", F.unit .. "target") and yTargetEnabled then
+                local color  = BattlegroundNumbers.db.profile.EnemyNameplates_YTarget_Color
+                F.name:SetTextColor(color[1],color[2],color[3],color[4])
+            end        
+        end
+
+        -- if custom and custom.EnabledEnemies and (UnitIsEnemy("player",F.unit) or UnitCanAttack("player",F.unit)) then
+        --     local color = custom.HColor
+        --     F.healthBar:SetStatusBarColor(color[1],color[2],color[3],color[4])
+        --     F.name:SetTextColor(color[1],color[2],color[3],color[4])
+        -- end
 
         if isCommonBG() then
-            local PlayerSortingTable = getEnemyList()
-            local ClassCounter = {}
-
-            for i = 1, #PlayerSortingTable do
-                local player = PlayerSortingTable[i]
-                local classTag = player.PlayerClass
-                local name = player.PlayerName
-                local role = player.PlayerRoleNumber
-                local spec = player.PlayerSpec
-                if role == 1 then
-                    classTag = "HEALER"
-                end
-                if role == 2 then
-                    classTag = "TANK"
-                end
-                if ClassCounter[classTag] == nil then
-                    ClassCounter[classTag] = 1
-                end
-                if GetUnitName(F.unit, true) == name then
-                    local nameStr = BattlegroundNumbers.db.profile.EnemyNameplates_Format
-                    if nameStr == nil or nameStr == "" then 
-                        nameStr = "CLASS SPEC - NUM"
-                    end
-                    nameStr = string.gsub(nameStr, "NAME", name)
-                    nameStr = string.gsub(nameStr, "CLASS", classTag)
-                    nameStr = string.gsub(nameStr, "SPEC", spec)
-                    nameStr = string.gsub(nameStr, "NUM", ClassCounter[classTag])
+            local player = EnemyMap[unitName]
+            if player then
+                local nameStr = BattlegroundNumbers.db.profile.EnemyNameplates_Format
+                if nameStr ~= nil and nameStr ~= "" then
+                    nameStr = string.gsub(nameStr, "NAME", player.name)
+                    nameStr = string.gsub(nameStr, "CLASS", player.classTag)
+                    nameStr = string.gsub(nameStr, "SPEC", player.spec)
+                    nameStr = string.gsub(nameStr, "NUM", player.number)
                     F.name:SetText(capitalize(nameStr))
+                end
 
-                    local enableCustomEnemyColor = BattlegroundNumbers.db.profile.EnemyNameplates_Color_Enabled
-                    if enableCustomEnemyColor then
-                        local color = BattlegroundNumbers.db.profile.EnemyNameplates_Color
-                        F.name:SetTextColor(color[1],color[2],color[3],color[4])
+                local enableCustomEnemyColor = BattlegroundNumbers.db.profile.EnemyNameplates_Color_Enabled
+                if enableCustomEnemyColor then
+                    local color = BattlegroundNumbers.db.profile.EnemyNameplates_Color
+                    F.name:SetTextColor(color[1],color[2],color[3],color[4])
+                end
+            end
+        end
+
+        if isArena() then
+            if UnitIsPlayer(F.unit) and UnitCanAttack("player",F.unit) then
+                local nameStr = BattlegroundNumbers.db.profile.EnemyNameplates_Format_Arena
+                if nameStr ~= nil and nameStr ~= "" then
+                    local arenaNum = getArenaNum(F.unit)
+                    if arenaNum > 0 then 
+                        local specId = GetArenaOpponentSpec(arenaNum)
+                        if specId and GetSpecializationRoleByID(specId) then 
+                            local name = GetUnitName(F.unit)
+                            local _, spec, _, _, _, class = GetSpecializationInfoByID(specId)
+                            nameStr = string.gsub(nameStr, "NAME", name)
+                            nameStr = string.gsub(nameStr, "CLASS", class)
+                            nameStr = string.gsub(nameStr, "SPEC", spec)
+                            nameStr = string.gsub(nameStr, "NUM", arenaNum)
+                            F.name:SetText(capitalize(nameStr))
+                        end
                     end
                 end
-                ClassCounter[classTag] = ClassCounter[classTag] + 1
+
+                local enableCustomEnemyColor = BattlegroundNumbers.db.profile.EnemyNameplates_Color_Enabled
+                if enableCustomEnemyColor then
+                    local color = BattlegroundNumbers.db.profile.EnemyNameplates_Color
+                    F.name:SetTextColor(color[1],color[2],color[3],color[4])
+                end
             end
+        end
+    end
+end
+
+local function updateNameColor(F)
+    if addonEnabled() and F.unit:find("nameplate") then
+        local unitName = GetUnitName(F.displayedUnit, true)
+
+        -- Allies Displays
+        
+        local custom = BattlegroundNumbers.db.profile.CustomUnits[unitName]
+        if custom and custom.EnabledAllies and (UnitIsFriend("player",F.unit) or UnitCanAssist("player",F.unit)) then
+            local color = custom.HColor
+            -- F.healthBar:SetStatusBarColor(color[1],color[2],color[3],color[4])
+            F.name:SetTextColor(color[1],color[2],color[3],color[4])
+        end
+
+        -- Enemies Displays
+
+        if custom and custom.EnabledEnemies and (UnitIsEnemy("player",F.unit) or UnitCanAttack("player",F.unit)) then
+            local color = custom.HColor
+            -- F.healthBar:SetStatusBarColor(color[1],color[2],color[3],color[4])
+            F.name:SetTextColor(color[1],color[2],color[3],color[4])
         end
     end
 end
@@ -225,21 +321,38 @@ do
             Enabled = true,
             EnemyNameplates_Color_Enabled = false,
             EnemyNameplates_Color = {1, 0, 0, 1},
+            EnemyNameplates_YTarget_Color_Enabled = false,
+            EnemyNameplates_YTarget_Color = {1,0,0,1},
             EnemyNameplates_Name = "",
             AllyNameplates_Color_Always = false,
             AllyNameplates_Color = {0, 1, 0, 1},
             AllyNameplates_Color_Enabled = {},
             AllyNameplates_Hide_HealthBar_Always = false,
             AllyNameplates_Hide_HealthBar_Enabled = {},
+            CustomUnits = {}
         }
     }
+    function BattlegroundNumbers:ADDON_LOADED(arg)
+        if arg == "BattlegroundNumbers" then
+            print("|cff03C6FCBattlegroundNumbers|r - AddOn loaded successfully. Use |cff00FF00/bgn|r for options.");
+        end
+    end
     function BattlegroundNumbers:PLAYER_LOGIN()
 		self.db = LibStub("AceDB-3.0"):New("BattlegroundNumbersDB", defaultSettings, true)
 
 		self:SetupOptions()
 		
 		self:UnregisterEvent("PLAYER_LOGIN")
-	end
+    end
+    function BattlegroundNumbers:UPDATE_BATTLEFIELD_SCORE()
+        if isCommonBG() then
+            EnemyList = getUpdatedEnemyList()
+        end
+    end
+    function BattlegroundNumbers:PLAYER_ENTERING_BATTLEGROUND()
+        EnemyList = {}
+    end
 end
 
 hooksecurefunc("CompactUnitFrame_OnUpdate",changeNameplateName)
+hooksecurefunc("CompactUnitFrame_UpdateName",updateNameColor)

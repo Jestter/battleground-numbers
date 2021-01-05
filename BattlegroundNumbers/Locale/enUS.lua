@@ -11,9 +11,22 @@ L["EnemyNameplates"] = "Enemy Nameplates"
 L["EnemyNameplates_Color_Enabled"] = "Enable Custom Color"
 L["EnemyNameplates_Color_Enabled_Desc"] = "Enables custom enemy name color"
 L["EnemyNameplates_Color"] = "Enemy Nameplate Names Color"
+L["EnemyNameplates_YTarget_Color_Enabled"] = "You're Their Target"
+L["EnemyNameplates_YTarget_Color_Enabled_Desc"] = "Enable change for color when enmey is targeting you"
+L["EnemyNameplates_YTarget_Color"] = "Color When You're Their Target"
+L["EnemyNameplates_YTarget_Color_Desc"] = "Color when the enemy is targeting you"
 L["EnemyNameplates_Color_Desc"] = "The color for enemy nameplate names when playing a battleground"
-L["EnemyNameplates_Format"] = "Name Format"
+L["EnemyNameplates_Format"] = "Name Format (Battlegrounds)"
 L["EnemyNameplates_Format_Desc"] = [=[Format for nameplate name. ie.: CLASS SPEC - NUM
+
+Available Variables:
+NAME - player name (includes realm if applies)
+CLASS - player class
+SPEC - player spec
+NUM - number (classwide).
+]=]
+L["EnemyNameplates_Format_Arena"] = "Name Format (Arena)"
+L["EnemyNameplates_Format_Arena_Desc"] = [=[Format for nameplate name. ie.: CLASS SPEC - NUM
 
 Available Variables:
 NAME - player name (includes realm if applies)
@@ -37,3 +50,17 @@ L["AllyNameplates_Hide_HealthBar_Enabled_Desc"] = "Hide ally nameplate health ba
 L["AllyNameplates_Hide_HealthBar_Arena"] = "Arenas"
 L["AllyNameplates_Hide_HealthBar_BG"] = "BattleGrounds"
 L["FUNC_NOT_COMBAT"] = "this functionality cannot be used in combat"
+L["CustomUnitSettings"] = "Custom Units (experimental)"
+L["CustomUnitSettings_Desc"] = "Settings for custom unit nameplates (experimental)"
+L["CustomUnit_AddUnit"] = "Add Unit"
+L["CustomUnit_AddUnit_Desc"] = "Add custom unit exact name here"
+L["CustomUnit_Units"] = "Units"
+L["CustomUnit_Units_Desc"] = "Units"
+L["CustomUnit_Color"] = "Nameplate Text Color"
+L["CustomUnit_Color_Desc"] = "Custom Unit nameplate color"
+L["CustomUnit_Enemy"] = "Enabled for Enemies"
+L["CustomUnit_Enemy_Desc"] = ""
+L["CustomUnit_Ally"] = "Enabled for Allies"
+L["CustomUnit_Ally_Desc"] = ""
+L["CustomUnit_Remove"] = "Remove"
+L["CustomUnit_Remove_Desc"] = "Remove this unit"
