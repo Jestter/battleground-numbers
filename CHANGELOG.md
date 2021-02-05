@@ -1,3 +1,7 @@
+`v1.4.1` | __2021-02-05__
+
+    - Add Role to nameplate display options
+
 `v1.4.0` | __2021-01-04__
 
     - Optimize some code for BGs
