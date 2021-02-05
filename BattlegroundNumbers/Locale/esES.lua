@@ -22,6 +22,7 @@ Available Variables:
 NAME - nombre del jugador (incluye reino si es que aplica)
 CLASS - clase del jugador
 SPEC - especialización del jugador
+ROLE - rol del jugador
 NUM - numero (por clase)
 ]=]
 L["EnemyNameplates_Format_Arena"] = "Formato de Nombre (Arena)"
