@@ -1,3 +1,8 @@
+`v1.5.0` | __2021-03-11__
+
+    - Bump WoW version
+    - Add BG number by spec option
+
 `v1.4.1` | __2021-02-05__
 
     - Add Role to nameplate display options

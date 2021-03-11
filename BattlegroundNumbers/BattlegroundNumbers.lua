@@ -75,6 +75,7 @@ local function getUpdatedEnemyList()
         table.sort(PlayerSortingTable, PlayerSortingByRoleClassName)
 
         local ClassCounter = {}
+        local SpecCounter = {}
         -- mapping order of classes and stuff
         for i = 1, #PlayerSortingTable do
             local player = PlayerSortingTable[i]
@@ -82,6 +83,7 @@ local function getUpdatedEnemyList()
             local name = player.PlayerName
             local role = player.PlayerRoleNumber
             local spec = player.PlayerSpec
+            local classspec = classTag .. spec
             local roleStr = ""
             if role == 1 then
                 roleStr = "HEALER"
@@ -95,14 +97,19 @@ local function getUpdatedEnemyList()
             if ClassCounter[classTag] == nil then
                 ClassCounter[classTag] = 1
             end
+            if SpecCounter[classspec] == nil then
+                SpecCounter[classspec] = 1
+            end
             EnemyMap[name] = {
                 name = name,
                 role = roleStr,
                 spec = spec,
                 classTag = classTag,
-                number = ClassCounter[classTag]
+                number = ClassCounter[classTag],
+                specNumber = SpecCounter[classspec]
             }
             ClassCounter[classTag] = ClassCounter[classTag] + 1
+            SpecCounter[classspec] = SpecCounter[classspec] + 1
         end
 
         return PlayerSortingTable
@@ -205,6 +212,7 @@ local function changeNameplateName(F)
                     nameStr = string.gsub(nameStr, "NAME", player.name)
                     nameStr = string.gsub(nameStr, "CLASS", player.classTag)
                     nameStr = string.gsub(nameStr, "SPEC", player.spec)
+                    nameStr = string.gsub(nameStr, "SNUM", player.specNumber)
                     nameStr = string.gsub(nameStr, "NUM", player.number)
                     nameStr = string.gsub(nameStr, "ROLE", player.role)
                     F.name:SetText(capitalize(nameStr))

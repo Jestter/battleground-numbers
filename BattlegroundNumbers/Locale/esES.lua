@@ -24,6 +24,7 @@ CLASS - clase del jugador
 SPEC - especialización del jugador
 ROLE - rol del jugador
 NUM - numero (por clase)
+SNUM - numero (por spec).
 ]=]
 L["EnemyNameplates_Format_Arena"] = "Formato de Nombre (Arena)"
 L["EnemyNameplates_Format_Arena_Desc"] = [=[Formato para el nombre en nameplates. Ej.: CLASS SPEC - NUM
