@@ -24,7 +24,8 @@ NAME - player name (includes realm if applies)
 CLASS - player class
 SPEC - player spec
 ROLE - player role
-NUM - number (classwide).
+NUM - number (class-wide).
+SNUM - number (spec-wide).
 ]=]
 L["EnemyNameplates_Format_Arena"] = "Name Format (Arena)"
 L["EnemyNameplates_Format_Arena_Desc"] = [=[Format for nameplate name. ie.: CLASS SPEC - NUM
