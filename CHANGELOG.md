@@ -1,3 +1,8 @@
+`v1.6.0` | __2021-04-08__
+
+    - Add Test option for BGs (format and color)
+    - Add Test option for arenas (format and color)
+
 `v1.5.0` | __2021-03-11__
 
     - Bump WoW version

@@ -149,19 +149,46 @@ function BattlegroundNumbers:LoadOptions()
 					type = "toggle",
 					name = L.Enabled,
 					desc = L.Enabled_Desc,
+					width = "full",
 					order = 1
+				},
+				TestBG = {
+					type = "execute",
+					name = L.TestBG,
+					desc = L.TestBG_Desc,
+					order = 2,
+					func = function() 
+						if self.test and self.test.bg then
+							self.test = {bg = false, arena = false}
+						else
+							self.test = {bg = true, arena = false}
+						end
+					end
+				},
+				TestArena = {
+					type = "execute",
+					name = L.TestArena,
+					desc = L.TestArena_Desc,
+					order = 3,
+					func = function() 
+						if self.test and self.test.arena then
+							self.test = {bg = false, arena = false}
+						else
+							self.test = {bg = false, arena = true}
+						end
+					end
 				},
 				EnemyNameplates_Color_Header = {
 					type = "header",
 					name = L.EnemyNameplates,
-					order = 2
+					order = 4
 				},
 				EnemyNameplates_Color_Enabled = {
 					type = "toggle",
 					name = L.EnemyNameplates_Color_Enabled,
 					desc = L.EnemyNameplates_Color_Enabled_Desc,
 					width = "normal",
-					order = 3
+					order = 5
 				},
 				EnemyNameplates_Color = {
 					type = "color",
@@ -171,7 +198,7 @@ function BattlegroundNumbers:LoadOptions()
 					disabled = function(...) 
 						return self.db.profile.EnemyNameplates_Color_Enabled == false
 					end,
-					order = 4,
+					order = 6,
 					set = function(option, ...) 
 						local R,G,B,A = ...
 						setOption(option, {R,G,B,A})
@@ -182,7 +209,7 @@ function BattlegroundNumbers:LoadOptions()
 					name = L.EnemyNameplates_YTarget_Color_Enabled,
 					desc = L.EnemyNameplates_YTarget_Color_Enabled_Desc,
 					width = "normal",
-					order = 5
+					order = 7
 				},
 				EnemyNameplates_YTarget_Color = {
 					type = "color",
@@ -192,7 +219,7 @@ function BattlegroundNumbers:LoadOptions()
 					disabled = function(...) 
 						return self.db.profile.EnemyNameplates_YTarget_Color_Enabled == false
 					end,
-					order = 6,
+					order = 8,
 					set = function(option, ...) 
 						local R,G,B,A = ...
 						setOption(option, {R,G,B,A})
@@ -203,26 +230,26 @@ function BattlegroundNumbers:LoadOptions()
 					name = L.EnemyNameplates_Format,
 					desc = L.EnemyNameplates_Format_Desc,
 					width = "full",
-					order = 7
+					order = 9
 				},
 				EnemyNameplates_Format_Arena = {
 					type = "input",
 					name = L.EnemyNameplates_Format_Arena,
 					desc = L.EnemyNameplates_Format_Arena_Desc,
 					width = "full",
-					order = 8
+					order = 10
 				},
 				AllyNameplates_Color_Header = {
 					type = "header",
 					name = L.AllyNameplates,
-					order = 9
+					order = 11
 				},
 				AllyNameplates_Color_Always = {
 					type = "toggle",
 					name = L.AllyNameplates_Color_Always,
 					desc = L.AllyNameplates_Color_Always_Desc,
 					width = "1.5",
-					order = 10
+					order = 12
 				},
 				AllyNameplates_Color = {
 					type = "color",
@@ -236,7 +263,7 @@ function BattlegroundNumbers:LoadOptions()
 						or self.db.profile.AllyNameplates_Color_Enabled["BattleGrounds"] == nil)
 						and self.db.profile.AllyNameplates_Color_Always == false
 					end,
-					order = 11,
+					order = 13,
 					set = function(option, ...) 
 						local R,G,B,A = ...
 						setOption(option, {R,G,B,A})
@@ -260,14 +287,14 @@ function BattlegroundNumbers:LoadOptions()
 						Arenas = L.AllyNameplates_Color_Arena,
 						BattleGrounds = L.AllyNameplates_Color_BG
 					},
-					order = 12
+					order = 14
 				},
 				AllyNameplates_Hide_HealthBar_Always = {
 					type = "toggle",
 					name = L.AllyNameplates_Hide_HealthBar_Always,
 					desc = L.AllyNameplates_Hide_HealthBar_Always_Desc,
 					width = "full",
-					order = 13
+					order = 15
 				},
 				AllyNameplates_Hide_HealthBar_Enabled = {
 					type = "multiselect",
@@ -287,7 +314,7 @@ function BattlegroundNumbers:LoadOptions()
 						Arenas = L.AllyNameplates_Hide_HealthBar_Arena,
 						BattleGrounds = L.AllyNameplates_Hide_HealthBar_BG
 					},
-					order = 14
+					order = 16
 				},
 			}
 		},
