@@ -3,6 +3,7 @@
   <Script file="Libs\Ace3\LibStub\LibStub.lua"/>
   <Include file="Libs\Ace3\CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
   <Include file="Libs\Ace3\AceGUI-3.0\AceGUI-3.0.xml"/>
+  <Include file="Libs\Ace3\AceConfig-3.0\AceConfig-3.0.xml"/>
   <Include file="Libs\Ace3\AceConfig-3.0\AceConfigRegistry-3.0\AceConfigRegistry-3.0.xml"/>
   <Include file="Libs\Ace3\AceConfig-3.0\AceConfigDialog-3.0\AceConfigDialog-3.0.xml"/>
   <Include file="Libs\Ace3\AceLocale-3.0\AceLocale-3.0.xml"/>
