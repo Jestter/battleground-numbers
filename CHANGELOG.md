@@ -1,3 +1,8 @@
+`v1.6.1` | __2021-04-08__
+
+    - Bump WoW version (9.1 CoD)
+    - Fix options not loading error
+
 `v1.6.0` | __2021-04-08__
 
     - Add Test option for BGs (format and color)
