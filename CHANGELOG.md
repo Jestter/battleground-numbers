@@ -1,3 +1,7 @@
+`v1.7.0` | __2022-03-10__
+
+    - Bump WoW version (9.2 EE)
+
 `v1.6.1` | __2021-04-08__
 
     - Bump WoW version (9.1 CoD)
