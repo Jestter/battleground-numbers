@@ -11,3 +11,13 @@ The purpose of this (WoW) AddOn is been able to coordinate target calls efficien
 ## Install
 
 Copy `BattlegroundNumbers` folder to your WoW AddOns folder.
+
+## Use
+
+- `/bgn` -- open config interface
+
+## Find it at
+
+- WoWUp
+- CurseForge
+- Wago
