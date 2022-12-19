@@ -248,6 +248,23 @@ local function changeNameplateName(F)
                 F.name:SetTextColor(color[1],color[2],color[3],color[4])
             end
         else
+            local custom = BattlegroundNumbers.db.profile.CustomUnits[unitName]
+            if custom then
+                if (custom.EnabledAllies and (UnitIsFriend("player",F.unit) or UnitCanAssist("player",F.unit))) or (custom.EnabledEnemies and (UnitIsEnemy("player",F.unit) or UnitCanAttack("player",F.unit))) then
+                    if custom.HideUnit then
+                        --F:GetParent():Hide()
+                        --F.healthBar:Hide()
+                        F.name:Hide()
+                        for i=1, select("#", F:GetChildren()) do
+                            local ChildFrame = select(i, F:GetChildren())
+                            ChildFrame:Hide()
+                        end
+                    elseif custom.HideHealthBar then
+                        F.healthBar:Hide()
+                    end
+                end
+            end
+
             if isCommonBG() then
                 local player = EnemyMap[unitName]
                 if player then
@@ -325,13 +342,6 @@ local function changeNameplateName(F)
                 end
             end
     
-            -- local custom = BattlegroundNumbers.db.profile.CustomUnits[unitName]
-            -- if custom and custom.EnabledAllies and (UnitIsFriend("player",F.unit) or UnitCanAssist("player",F.unit)) then
-            --     local color = custom.HColor
-            --     F.healthBar:SetStatusBarColor(color[1],color[2],color[3],color[4])
-            --     F.name:SetTextColor(color[1],color[2],color[3],color[4])
-            -- end
-    
             -- Enemies Displays
             -- colorize enemy targeting you
             if UnitCanAttack("player",F.unit) then
@@ -341,12 +351,6 @@ local function changeNameplateName(F)
                     F.name:SetTextColor(color[1],color[2],color[3],color[4])
                 end
             end
-    
-            -- if custom and custom.EnabledEnemies and (UnitIsEnemy("player",F.unit) or UnitCanAttack("player",F.unit)) then
-            --     local color = custom.HColor
-            --     F.healthBar:SetStatusBarColor(color[1],color[2],color[3],color[4])
-            --     F.name:SetTextColor(color[1],color[2],color[3],color[4])
-            -- end
         end
     end
 end

@@ -1,3 +1,8 @@
+`v1.8.0` | __2022-12-18__
+
+    - Bump WoW version (10.0.2 DF)
+    - Add feature to hide a custom unit nameplate (experimental)
+
 `v1.7.0` | __2022-03-10__
 
     - Bump WoW version (9.2 EE)

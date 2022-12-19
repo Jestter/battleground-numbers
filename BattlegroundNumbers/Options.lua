@@ -108,11 +108,43 @@ function BattlegroundNumbers:CustomUnitOptions()
 							self.db.profile.CustomUnits[k].EnabledAllies = value
 						end
 					},
+					CustomUnit_HideUnit = {
+						type = "toggle",
+						name = L.CustomUnit_HideUnit,
+						desc = L.CustomUnit_HideUnit_Desc,
+						order = 3,
+						get = function(option, key)
+							if self.db.profile.CustomUnits[k] then
+								local value = self.db.profile.CustomUnits[k].HideUnit
+								return value
+							end
+							return false
+						end,
+						set = function(option, value)
+							self.db.profile.CustomUnits[k].HideUnit = value
+						end
+					},
+					CustomUnit_HideHealthBar = {
+						type = "toggle",
+						name = L.CustomUnit_HideHealthBar,
+						desc = L.CustomUnit_HideHealthBar_Desc,
+						order = 4,
+						get = function(option, key)
+							if self.db.profile.CustomUnits[k] then
+								local value = self.db.profile.CustomUnits[k].HideHealthBar
+								return value
+							end
+							return false
+						end,
+						set = function(option, value)
+							self.db.profile.CustomUnits[k].HideHealthBar = value
+						end
+					},
 					CustomUnit_Remove = {
 						type = "execute",
 						name = L.CustomUnit_Remove,
 						desc = L.CustomUnit_Remove_Desc,
-						order = 3,
+						order = 5,
 						func = function()
 							self.db.profile.CustomUnits[k] = nil
 							self:LoadOptions()
@@ -131,7 +163,9 @@ function BattlegroundNumbers:AddCustomUnit(key)
 	self.db.profile.CustomUnits[key] = {
 		HColor = {1,0,0,1},
 		EnabledAllies = false,
-		EnabledEnemies = false
+		EnabledEnemies = false,
+		HideHealthBar = false,
+		HideUnit = false
 	}
 	self:LoadOptions()
 	AceConfigRegistry:NotifyChange("BattlegroundNumbers")
