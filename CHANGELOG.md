@@ -1,3 +1,11 @@
+`v1.9.0` | __2023-01-26__
+
+    - Bump WoW version (10.0.5 DF)
+    - Add feature to resize nameplate healthbar width (allies)
+    - New filter option - World - for ally healthbar display
+    - Enhance options layout
+    - Custom units - New button to add the target unit to the list
+
 `v1.8.0` | __2022-12-18__
 
     - Bump WoW version (10.0.2 DF)

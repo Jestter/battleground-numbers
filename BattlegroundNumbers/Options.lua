@@ -160,15 +160,26 @@ function BattlegroundNumbers:CustomUnitOptions()
 end
 
 function BattlegroundNumbers:AddCustomUnit(key)
-	self.db.profile.CustomUnits[key] = {
-		HColor = {1,0,0,1},
-		EnabledAllies = false,
-		EnabledEnemies = false,
-		HideHealthBar = false,
-		HideUnit = false
-	}
-	self:LoadOptions()
-	AceConfigRegistry:NotifyChange("BattlegroundNumbers")
+	if self.db.profile.CustomUnits[key] == nil then
+		self.db.profile.CustomUnits[key] = {
+			HColor = {1,0,0,1},
+			EnabledAllies = false,
+			EnabledEnemies = false,
+			HideHealthBar = false,
+			HideUnit = false
+		}
+		self:LoadOptions()
+		AceConfigRegistry:NotifyChange("BattlegroundNumbers")
+		AceConfigDialog:SelectGroup("BattlegroundNumbers", "CustomUnits", "Units" ,key)
+	end
+end
+
+function BattlegroundNumbers:EnableCustomWidth()
+	C_NamePlate.SetNamePlateFriendlySize((self.db.profile.AllyNameplates_Width or 1)*self.baseNameplateSize.width, self.baseNameplateSize.heigth)
+end
+
+function BattlegroundNumbers:DisableCustomWidth()
+	C_NamePlate.SetNamePlateFriendlySize(self.baseNameplateSize.width, self.baseNameplateSize.heigth)
 end
 
 function BattlegroundNumbers:LoadOptions()
@@ -184,6 +195,17 @@ function BattlegroundNumbers:LoadOptions()
 					name = L.Enabled,
 					desc = L.Enabled_Desc,
 					width = "full",
+					set = function(option, value)
+						if value then
+							self:EnableCustomWidth()
+						else
+							self:DisableCustomWidth()
+						end
+						setOption(option, value)
+					end,
+					get = function (option)
+						return getOption(option)
+					end,
 					order = 1
 				},
 				TestBG = {
@@ -194,8 +216,10 @@ function BattlegroundNumbers:LoadOptions()
 					func = function() 
 						if self.test and self.test.bg then
 							self.test = {bg = false, arena = false}
+							self:EnableCustomWidth()
 						else
 							self.test = {bg = true, arena = false}
+							self:DisableCustomWidth()
 						end
 					end
 				},
@@ -207,8 +231,10 @@ function BattlegroundNumbers:LoadOptions()
 					func = function() 
 						if self.test and self.test.arena then
 							self.test = {bg = false, arena = false}
+							self:EnableCustomWidth()
 						else
 							self.test = {bg = false, arena = true}
+							self:DisableCustomWidth()
 						end
 					end
 				},
@@ -229,6 +255,7 @@ function BattlegroundNumbers:LoadOptions()
 					name = L.EnemyNameplates_Color,
 					desc = L.EnemyNameplates_Color_Desc,
 					hasAlpha = true,
+					width = 2,
 					disabled = function(...) 
 						return self.db.profile.EnemyNameplates_Color_Enabled == false
 					end,
@@ -250,6 +277,7 @@ function BattlegroundNumbers:LoadOptions()
 					name = L.EnemyNameplates_YTarget_Color,
 					desc = L.EnemyNameplates_YTarget_Color_Desc,
 					hasAlpha = true,
+					width = 2,
 					disabled = function(...) 
 						return self.db.profile.EnemyNameplates_YTarget_Color_Enabled == false
 					end,
@@ -282,7 +310,7 @@ function BattlegroundNumbers:LoadOptions()
 					type = "toggle",
 					name = L.AllyNameplates_Color_Always,
 					desc = L.AllyNameplates_Color_Always_Desc,
-					width = "1.5",
+					width = 1.5,
 					order = 12
 				},
 				AllyNameplates_Color = {
@@ -319,7 +347,8 @@ function BattlegroundNumbers:LoadOptions()
 					end,
 					values = {
 						Arenas = L.AllyNameplates_Color_Arena,
-						BattleGrounds = L.AllyNameplates_Color_BG
+						BattleGrounds = L.AllyNameplates_Color_BG,
+						World = L.AllyNameplates_Color_World
 					},
 					order = 14
 				},
@@ -346,9 +375,31 @@ function BattlegroundNumbers:LoadOptions()
 					end,
 					values = {
 						Arenas = L.AllyNameplates_Hide_HealthBar_Arena,
-						BattleGrounds = L.AllyNameplates_Hide_HealthBar_BG
+						BattleGrounds = L.AllyNameplates_Hide_HealthBar_BG,
+						World = L.AllyNameplates_Hide_HealthBar_World,
 					},
 					order = 16
+				},
+				AllyNameplates_Width = {
+					type = "range",
+					name = L.AllyNameplates_Width,
+					desc = L.AllyNameplates_Width_Desc,
+					width = "full",
+					min = 0,
+					max = 5,
+					softMin = 0.1,
+					softMax = 1.5,
+					isPercent = true,
+					get = function(option)
+						return self.db.profile.AllyNameplates_Width or 1
+					end,
+					set = function(option, value) 
+						self.db.profile.AllyNameplates_Width = value
+						if(self.db.profile.Enabled) then
+							self:EnableCustomWidth()
+						end
+					end,
+					order = 17
 				},
 			}
 		},
@@ -363,7 +414,7 @@ function BattlegroundNumbers:LoadOptions()
 					type = "input",
 					name = L.CustomUnit_AddUnit,
 					desc = L.CustomUnit_AddUnit_Desc,
-					width = "full",
+					width = 2.5,
 					get = function(option)
 						return ""
 					end,
@@ -372,11 +423,21 @@ function BattlegroundNumbers:LoadOptions()
 					end,
 					order = 0
 				},
+				addTargetUnit = {
+					type = "execute",
+					name = L.CustomUnit_addTargetUnit,
+					desc = L.CustomUnit_addTargetUnit_Desc,
+					order = 5,
+					width = 0.7,
+					func = function()
+						self:AddCustomUnit(UnitName("target"))
+					end,
+				},
 				Units = {
 					type = "group",
 					name = L.CustomUnit_Units,
 					desc = L.CustomUnit_Units_Desc,
-					childGroups = "select",
+					childGroups = "tree",
 					order = 100,
 					args = self:CustomUnitOptions()
 				}
@@ -389,7 +450,7 @@ function BattlegroundNumbers:CreateOptions()
 	self.options = {
 		type = "group",
 		name = "BattlegroundNumbers " .. GetAddOnMetadata(addonName, "Version"),
-		childGroups = "tree",
+		childGroups = "tab",
 		get = getOption,
 		set = setOption,
 		args = {}
